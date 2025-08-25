@@ -10,6 +10,7 @@
 #include "Num.hpp"
 #include "Real.hpp"
 #include "Word.hpp"
+#include "sptr.h"
 
 namespace lexer {
 

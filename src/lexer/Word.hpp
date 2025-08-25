@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Token.hpp"
+#include "sptr.h"
 
 #ifdef _WIN32     // Only on Windows
 #ifdef UNIT_TEST  // Only when building tests

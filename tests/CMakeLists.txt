@@ -1,5 +1,6 @@
 ﻿set(TEST_SOURCES
     test_lexer.cpp
+	test_symbols.cpp
 )
 
 add_executable(runTests ${TEST_SOURCES})
@@ -7,6 +8,7 @@ add_executable(runTests ${TEST_SOURCES})
 target_link_libraries(runTests
     PRIVATE
         lexer
+		symbols
         GTest::gtest_main
 )
 

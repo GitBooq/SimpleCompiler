@@ -10,11 +10,19 @@ set(PROJECT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(lexer
     src/lexer/Lexer.cpp
 )
-
 target_include_directories(lexer PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/lexer
 	${PROJECT_INCLUDE_DIR}
 )
+
+# add lib with symbols module (headers only)
+add_library(symbols INTERFACE)
+target_include_directories(symbols INTERFACE
+	${CMAKE_CURRENT_SOURCE_DIR}/src/symbols
+	${PROJECT_INCLUDE_DIR}
+)
+
+
 
 # GoogleTest
 include(FetchContent)

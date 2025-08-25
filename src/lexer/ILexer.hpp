@@ -6,9 +6,7 @@
 #include <memory>
 
 #include "Token.hpp"
-
-template <typename T>
-using sptr = std::shared_ptr<T>;
+#include "sptr.h"
 
 namespace lexer {
 

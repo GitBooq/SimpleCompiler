@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "lexer/Lexer.hpp"
+#include "Lexer.hpp"
 
 using namespace lexer;
 
