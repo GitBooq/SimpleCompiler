@@ -22,7 +22,34 @@ target_include_directories(symbols INTERFACE
 	${PROJECT_INCLUDE_DIR}
 )
 
+# Add lib with AST module
+add_library(ast
+    src/ast/Expr.cpp
+)
+target_include_directories(ast PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ast
+	${PROJECT_INCLUDE_DIR}
+)
 
+target_link_libraries(ast PUBLIC 
+	symbols
+	lexer
+	emit
+)
+
+# Add lib with Emit module
+add_library(emit
+    src/emit/Emitter.cpp
+	
+)
+target_include_directories(emit PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/emit
+	${PROJECT_INCLUDE_DIR}
+)
+
+target_link_libraries(emit PRIVATE 
+	lexer
+)
 
 # GoogleTest
 include(FetchContent)
