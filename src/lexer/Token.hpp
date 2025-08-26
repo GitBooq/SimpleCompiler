@@ -22,6 +22,7 @@ struct Token {
    * @param l Token lexeme (defaults to empty).
    */
   Token(Tag t, std::string l = "") : tag(t), lexeme(std::move(l)) {}
+  Token(Tag t, char c) : tag(t), lexeme(std::string(1, c)) {}
   virtual ~Token() = default;
 
   /**
