@@ -7,7 +7,7 @@
 using namespace lexer;
 
 TEST(LexerTest, RecognizesKeyword) {
-  std::istringstream input("if else while");
+  std::istringstream input("if else while + - / *");
   Lexer lex(input);
 
   sptr<Token> t1 = lex.scan();
@@ -18,6 +18,18 @@ TEST(LexerTest, RecognizesKeyword) {
 
   sptr<Token> t3 = lex.scan();
   EXPECT_EQ(t3->tag, Tag::WHILE);
+
+  t3 = lex.scan();
+  EXPECT_EQ(t3->tag, Tag::OP_PLUS);
+
+  t3 = lex.scan();
+  EXPECT_EQ(t3->tag, Tag::OP_MINUS);
+
+  t3 = lex.scan();
+  EXPECT_EQ(t3->tag, Tag::OP_DIV);
+
+  t3 = lex.scan();
+  EXPECT_EQ(t3->tag, Tag::OP_MUL);
 }
 
 TEST(LexerTest, RecognizesInteger) {
