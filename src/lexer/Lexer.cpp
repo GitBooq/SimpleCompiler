@@ -58,38 +58,46 @@ sptr<Token> Lexer::scan() {
 
   char c = readch();
 
-  // Handle two-character operators
+  // Handle operators
   switch (c) {
     case '&':
       if (readch('&'))
         return Word::And;
       else
-        return std::make_shared<Token>(Tag('&'));
+        return std::make_shared<Token>(Tag::bitAND, c);
     case '|':
       if (readch('|'))
         return Word::Or;
       else
-        return std::make_shared<Token>(Tag('|'));
+        return std::make_shared<Token>(Tag::bitOR, c);
     case '=':
       if (readch('='))
         return Word::eq;
       else
-        return std::make_shared<Token>(Tag('='));
+        return std::make_shared<Token>(Tag::ASSIGN, c);
     case '!':
       if (readch('='))
         return Word::ne;
       else
-        return std::make_shared<Token>(Tag('!'));
+        return std::make_shared<Token>(Tag::UnaryNOT, c);
     case '<':
       if (readch('='))
         return Word::le;
       else
-        return std::make_shared<Token>(Tag('<'));
+        return std::make_shared<Token>(Tag::LESS, c);
     case '>':
       if (readch('='))
         return Word::ge;
       else
-        return std::make_shared<Token>(Tag('>'));
+        return std::make_shared<Token>(Tag::GREATER, c);
+    case '+':
+      return std::make_shared<Token>(Tag::OP_PLUS, c);
+    case '-':
+      return std::make_shared<Token>(Tag::OP_MINUS, c);
+    case '*':
+      return std::make_shared<Token>(Tag::OP_MUL, c);
+    case '/':
+      return std::make_shared<Token>(Tag::OP_DIV, c);
   }
 
   // Handle numeric literals
