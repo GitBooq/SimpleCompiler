@@ -38,6 +38,23 @@ struct MockEmitter : public emit::IEmitter {
                               const std::string& i) override {
     return a + "[" + i + "]";
   }
+
+  /* Mock stubs (for Statements) */
+  virtual void emitIf(const std::string& condLabel,
+                      const std::function<void()>& thenBlock) {};
+  virtual void emitIfElse(const std::string& condLabel,
+                          const std::function<void()>& thenBlock,
+                          const std::function<void()>& elseBlock) {};
+  virtual void emitWhile(const std::function<std::string()>& condGen,
+                         const std::function<void()>& bodyGen) {};
+  virtual void emitDoWhile(const std::function<void()>& bodyGen,
+                           const std::function<std::string()>& condGen) {};
+  virtual void emitBreak() {};
+  virtual void emitAssign(const std::string& target, const std::string& value) {
+  };
+  virtual void emitArrayAssign(const std::string& arr, const std::string& idx,
+                               const std::string& value) {};
+  /*-------------------------------------------------------------------------*/
 };
 
 // Tests
