@@ -25,6 +25,7 @@ target_include_directories(symbols INTERFACE
 # Add lib with AST module
 add_library(ast
     src/ast/Expr.cpp
+	src/ast/Stmt.cpp
 )
 target_include_directories(ast PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ast
