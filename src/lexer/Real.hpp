@@ -17,7 +17,8 @@ struct Real : public Token {
    * @brief Creates a floating-point token.
    * @param v Floating-point value.
    */
-  explicit Real(float v) : Token(Tag::REAL, std::to_string(v)), value(v) {}
+  explicit Real(float v, SourceLocation loc = {0, 0})
+      : Token(Tag::REAL, std::to_string(v), loc), value(v) {}
 };
 
 }  // namespace lexer

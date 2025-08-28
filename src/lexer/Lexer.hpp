@@ -6,6 +6,7 @@
 #include <istream>
 #include <unordered_map>
 
+#include "ASTNode.hpp"
 #include "ILexer.hpp"
 #include "Num.hpp"
 #include "Real.hpp"
@@ -19,8 +20,8 @@ namespace lexer {
  */
 struct Lexer : public ILexer {
   std::istream& input;                                ///< Input data stream.
-  int lineNumber;                                     ///< Current line number.
   std::unordered_map<std::string, sptr<Word>> words;  ///< Keyword table.
+  SourceLocation loc;
 
   /**
    * @brief Lexer constructor.
@@ -44,7 +45,7 @@ struct Lexer : public ILexer {
   sptr<Token> scan() override;
 
   /// @copydoc ILexer::line()
-  int line() const override { return lineNumber; }
+  int line() const override { return loc.line; }
 };
 
 }  // namespace lexer

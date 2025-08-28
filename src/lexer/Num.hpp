@@ -17,7 +17,8 @@ struct Num : public Token {
    * @brief Creates an integer token.
    * @param v Integer value.
    */
-  explicit Num(int v) : Token(Tag::NUM, std::to_string(v)), value(v) {}
+  explicit Num(int v, SourceLocation loc = {0, 0})
+      : Token(Tag::NUM, std::to_string(v), loc), value(v) {}
 };
 
 }  // namespace lexer

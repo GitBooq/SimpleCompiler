@@ -5,6 +5,7 @@
 #pragma once
 #include <string>
 
+#include "ASTNode.hpp"
 #include "Tag.hpp"
 
 namespace lexer {
@@ -15,14 +16,18 @@ namespace lexer {
 struct Token {
   Tag tag;            /**< Token tag */
   std::string lexeme; /**< Token text representation */
+  SourceLocation loc; /**< Line/column position in source */
 
   /**
    * @brief Constructs a token.
    * @param t Token tag.
    * @param l Token lexeme (defaults to empty).
    */
-  Token(Tag t, std::string l = "") : tag(t), lexeme(std::move(l)) {}
-  Token(Tag t, char c) : tag(t), lexeme(std::string(1, c)) {}
+  Token(Tag t, std::string l = "", SourceLocation loc = {0, 0})
+      : tag(t), lexeme(std::move(l)), loc(loc) {}
+
+  Token(Tag t, char c, SourceLocation loc = {0, 0})
+      : tag(t), lexeme(std::string(1, c)), loc(loc) {}
   virtual ~Token() = default;
 
   /**

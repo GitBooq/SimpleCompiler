@@ -24,11 +24,14 @@ struct Word : public Token {
    * @param s String value.
    * @param tag Token tag.
    */
-  Word(std::string s, Tag tag) : Token(tag, std::move(s)) {}
+  Word(std::string s, Tag tag, SourceLocation loc = {0, 0})
+      : Token(tag, std::move(s), loc) {}
 
-#ifdef _WIN32                                      // Only on Windows
-#ifdef UNIT_TEST                                   // Only when building tests
-  Word() : Token(Tag::ID, "") { TRACE("TRACE"); }  // temporary for debug
+#ifdef _WIN32     // Only on Windows
+#ifdef UNIT_TEST  // Only when building tests
+  Word() : Token(Tag::ID, "", {1, 1}) {
+    TRACE("TRACE");
+  }  // temporary for debug
 #endif
 #endif
 

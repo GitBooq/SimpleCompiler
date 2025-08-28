@@ -6,9 +6,11 @@
 
 #include <cctype>
 
+#include "TypeToken.hpp"
+
 namespace lexer {
 
-Lexer::Lexer(std::istream& in) : input(in), lineNumber(1) {
+Lexer::Lexer(std::istream& in) : input(in), loc{1, 1} {
   // Register reserved keywords
   reserve(std::make_shared<Word>("if", Tag::IF));
   reserve(std::make_shared<Word>("else", Tag::ELSE));
@@ -17,17 +19,27 @@ Lexer::Lexer(std::istream& in) : input(in), lineNumber(1) {
   reserve(std::make_shared<Word>("break", Tag::BREAK));
   reserve(Word::True);
   reserve(Word::False);
-  reserve(std::make_shared<Word>("int", Tag::BASIC));
-  reserve(std::make_shared<Word>("float", Tag::BASIC));
-  reserve(std::make_shared<Word>("bool", Tag::BASIC));
-  reserve(std::make_shared<Word>("char", Tag::BASIC));
+  reserve(std::make_shared<TypeToken>(symbols::Type::Int));
+  reserve(std::make_shared<TypeToken>(symbols::Type::Float));
+  reserve(std::make_shared<TypeToken>(symbols::Type::Bool));
+  reserve(std::make_shared<TypeToken>(symbols::Type::Char));
 }
 
 void Lexer::reserve(const sptr<Word>& w) { words.insert({w->lexeme, w}); }
 
 char Lexer::readch() {
+  int& lineNumber = loc.line;
+  int& columnNumber = loc.column;
   char c;
-  if (input.get(c)) return c;
+  if (input.get(c)) {
+    if (c == '\n') {
+      ++lineNumber;
+      columnNumber = 0;
+    } else {
+      ++columnNumber;
+    }
+    return c;
+  }
   return '\0';  // Null char to indicate EOF
 }
 
@@ -41,14 +53,23 @@ bool Lexer::readch(char c) {
 }
 
 sptr<Token> Lexer::scan() {
-  // Skip whitespace and track line breaks
+  // save current symbol location
+  SourceLocation startLoc{loc.line, loc.column + 1};
+
+  int& lineNumber = loc.line;
+  int& columnNumber = loc.column;
+
+  // Skip ws and control newlines
   for (;;) {
-    if (!input.good()) return std::make_shared<Token>(Tag(0));  // End of input
+    if (!input.good()) return std::make_shared<Token>(Tag::END, "", startLoc);
+
     char c = readch();
-    if (c == ' ' || c == '\t')
+    if (c == ' ' || c == '\t') {
       continue;
-    else if (c == '\n') {
+    } else if (c == '\n') {
       ++lineNumber;
+      columnNumber = 0;
+      startLoc = {lineNumber, columnNumber + 1};
       continue;
     } else {
       input.putback(c);
@@ -58,62 +79,60 @@ sptr<Token> Lexer::scan() {
 
   char c = readch();
 
-  // Handle operators
+  // Operators and separators
   switch (c) {
     case '&':
       if (readch('&'))
-        return Word::And;
-      else
-        return std::make_shared<Token>(Tag::bitAND, c);
+        return std::make_shared<Word>(Word::And->lexeme, Word::And->tag,
+                                      startLoc);
+      return std::make_shared<Token>(Tag::bitAND, c, startLoc);
     case '|':
       if (readch('|'))
-        return Word::Or;
-      else
-        return std::make_shared<Token>(Tag::bitOR, c);
+        return std::make_shared<Word>(Word::Or->lexeme, Word::Or->tag,
+                                      startLoc);
+      return std::make_shared<Token>(Tag::bitOR, c, startLoc);
     case '=':
       if (readch('='))
-        return Word::eq;
-      else
-        return std::make_shared<Token>(Tag::ASSIGN, c);
+        return std::make_shared<Word>(Word::eq->lexeme, Word::eq->tag,
+                                      startLoc);
+      return std::make_shared<Token>(Tag::ASSIGN, c, startLoc);
     case '!':
       if (readch('='))
-        return Word::ne;
-      else
-        return std::make_shared<Token>(Tag::UnaryNOT, c);
+        return std::make_shared<Word>(Word::ne->lexeme, Word::ne->tag,
+                                      startLoc);
+      return std::make_shared<Token>(Tag::UnaryNOT, c, startLoc);
     case '<':
       if (readch('='))
-        return Word::le;
-      else
-        return std::make_shared<Token>(Tag::LESS, c);
+        return std::make_shared<Word>(Word::le->lexeme, Word::le->tag,
+                                      startLoc);
+      return std::make_shared<Token>(Tag::LESS, c, startLoc);
     case '>':
       if (readch('='))
-        return Word::ge;
-      else
-        return std::make_shared<Token>(Tag::GREATER, c);
+        return std::make_shared<Word>(Word::ge->lexeme, Word::ge->tag,
+                                      startLoc);
+      return std::make_shared<Token>(Tag::GREATER, c, startLoc);
     case '+':
-      return std::make_shared<Token>(Tag::OP_PLUS, c);
+      return std::make_shared<Token>(Tag::OP_PLUS, c, startLoc);
     case '-':
-      return std::make_shared<Token>(Tag::OP_MINUS, c);
+      return std::make_shared<Token>(Tag::OP_MINUS, c, startLoc);
     case '*':
-      return std::make_shared<Token>(Tag::OP_MUL, c);
+      return std::make_shared<Token>(Tag::OP_MUL, c, startLoc);
     case '/':
-      return std::make_shared<Token>(Tag::OP_DIV, c);
+      return std::make_shared<Token>(Tag::OP_DIV, c, startLoc);
   }
 
-  // Handle numeric literals
+  // Numbers
   if (std::isdigit(c)) {
     int value = 0;
     bool isFloat = false;
     float fValue = 0.0f;
     float divisor = 10.0f;
 
-    // Integer part
     do {
       value = 10 * value + (c - '0');
       c = readch();
     } while (std::isdigit(c));
 
-    // Fractional part
     if (c == '.') {
       isFloat = true;
       c = readch();
@@ -125,11 +144,11 @@ sptr<Token> Lexer::scan() {
     }
 
     if (c != '\0') input.putback(c);
-    if (isFloat) return std::make_shared<Real>(value + fValue);
-    return std::make_shared<Num>(value);
+    if (isFloat) return std::make_shared<Real>(value + fValue, startLoc);
+    return std::make_shared<Num>(value, startLoc);
   }
 
-  // Handle identifiers and keywords
+  // Identificators / keywords
   if (std::isalpha(c)) {
     std::string s;
     do {
@@ -139,15 +158,28 @@ sptr<Token> Lexer::scan() {
     if (c != '\0') input.putback(c);
 
     auto it = words.find(s);
-    if (it != words.end()) return it->second;
+    if (it != words.end()) {
+      // keyword - return copy with location
+      auto tokenPtr = it->second;
 
-    sptr<Word> w = std::make_shared<Word>(s, Tag::ID);
+      if (auto typeTok =
+              std::dynamic_pointer_cast<lexer::TypeToken>(tokenPtr)) {
+        // keyword is a base type, copy as TypeToken
+        return std::make_shared<lexer::TypeToken>(typeTok->typeInfo, startLoc);
+      }
+      // else common keyword
+      return std::make_shared<lexer::Word>(tokenPtr->lexeme, tokenPtr->tag,
+                                           startLoc);
+    }
+
+    // new id
+    sptr<Word> w = std::make_shared<Word>(s, Tag::ID, startLoc);
     reserve(w);
     return w;
   }
 
-  // Return token for single-character symbols
-  return std::make_shared<Token>(Tag(c));
+  // else one-char symbols
+  return std::make_shared<Token>(Tag(c), c, startLoc);
 }
 
 }  // namespace lexer
