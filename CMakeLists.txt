@@ -6,6 +6,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(PROJECT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+add_executable(main
+	${CMAKE_CURRENT_SOURCE_DIR}/src/main/main.cpp
+)
+target_link_libraries(main
+    PRIVATE
+        lexer
+        parser
+		symbols
+)
+
 # Add lib with Lexer module
 add_library(lexer
     src/lexer/Lexer.cpp
@@ -13,6 +23,12 @@ add_library(lexer
 target_include_directories(lexer PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/lexer
 	${PROJECT_INCLUDE_DIR}
+)
+target_link_libraries(lexer 
+	PRIVATE 
+		symbols
+	PUBLIC
+		ast
 )
 
 # add lib with symbols module (headers only)
@@ -41,15 +57,29 @@ target_link_libraries(ast PUBLIC
 # Add lib with Emit module
 add_library(emit
     src/emit/Emitter.cpp
-	
 )
 target_include_directories(emit PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/emit
 	${PROJECT_INCLUDE_DIR}
 )
-
 target_link_libraries(emit PRIVATE 
 	lexer
+)
+
+# Add lib with Parser module
+add_library(parser
+	src/parser/Parser.cpp
+)
+target_include_directories(parser PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/parser
+	${PROJECT_INCLUDE_DIR}
+)
+target_link_libraries(parser 
+	PRIVATE 
+		lexer
+		symbols
+	PUBLIC
+		ast
 )
 
 # GoogleTest
