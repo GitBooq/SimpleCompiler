@@ -9,6 +9,7 @@
 
 #include "Array.hpp"
 #include "IEmitter.hpp"
+#include "Id.hpp"
 #include "Token.hpp"
 #include "Type.hpp"
 #include "Word.hpp"
@@ -118,4 +119,9 @@ Access::Access(SourceLocation loc, sptr<Expr> arr, sptr<Expr> idx)
     exprType = nullptr;  // TODO Error
   }
 }
+
+std::string IdExpr::emit(emit::IEmitter& out) const {
+  return out.emitIdentifier(sym->name, sym->offset);
+}
+
 }  // namespace ast

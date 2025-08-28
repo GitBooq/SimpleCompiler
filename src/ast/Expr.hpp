@@ -5,6 +5,7 @@
 
 #pragma once
 #include "ASTNode.hpp"
+#include "Id.hpp"
 #include "sptr.h"
 
 /* Forward declarations */
@@ -153,6 +154,18 @@ struct Access : public Expr {
   sptr<Expr> array;
   sptr<Expr> index;
   Access(SourceLocation loc, sptr<Expr> arr, sptr<Expr> idx);
+  std::string emit(emit::IEmitter& out) const override;
+};
+
+/**
+ * @brief Identificator node
+ */
+struct IdExpr : public Expr {
+  sptr<symbols::Id> sym;
+  IdExpr(SourceLocation loc, sptr<symbols::Id> s)
+      : Expr(loc), sym(std::move(s)) {
+    exprType = sym->type;
+  }
   std::string emit(emit::IEmitter& out) const override;
 };
 }  // namespace ast
