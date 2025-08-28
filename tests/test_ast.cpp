@@ -40,6 +40,9 @@ struct MockEmitter : public emit::IEmitter {
                               const std::string& i) override {
     return a + "[" + i + "]";
   }
+  std::string emitIdentifier(const std::string& name, int offset) {
+    return name;
+  }
 
   // --- Statements ---
   std::vector<std::string> log;
