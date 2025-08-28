@@ -43,6 +43,12 @@ struct IEmitter {
 
   /// Temp variable
   virtual std::string emitTemp(int number) = 0;
+
+  /// Identifier: variable name with optional offset (for stack/relative
+  /// addressing)
+  virtual std::string emitIdentifier(const std::string& name,
+                                     int offset = 0) = 0;
+
   /*-------------------------------------------------------------------------*/
 
   /* Statements */

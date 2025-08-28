@@ -33,6 +33,9 @@ struct TextEmitter : IEmitter {
   /// \copydoc IEmitter::emitTemp
   std::string emitTemp(int number) override;
 
+  /// \copydoc IEmitter::emitIdentifier
+  std::string emitIdentifier(const std::string& name, int offset = 0) override;
+
   /*-------------------------------------------------------------------------*/
 
   /* Statements */

@@ -31,6 +31,11 @@ std::string TextEmitter::emitArrayAccess(const std::string& arr,
 std::string TextEmitter::emitTemp(int number) {
   return "t" + std::to_string(number);
 }
+
+std::string TextEmitter::emitIdentifier(const std::string& name,
+                                        int /*offset*/) {
+  return name;
+}
 /*-------------------------------------------------------------------------*/
 
 /* Statements */
