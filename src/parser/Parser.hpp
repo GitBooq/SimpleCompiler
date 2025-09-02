@@ -160,6 +160,11 @@ class Parser {
   sptr<ast::Expr> factor();
 };
 
+/**
+ * @brief Error handling
+ * @param s String containing error message.
+ * @param loc Location where the error occurred at.
+ */
 void error(const std::string& s, const SourceLocation& loc);
 
 }  // namespace parser
