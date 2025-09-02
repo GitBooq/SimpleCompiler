@@ -160,7 +160,7 @@ sptr<Token> Lexer::scan() {
     auto it = words.find(s);
     if (it != words.end()) {
       // keyword - return copy with location
-      auto tokenPtr = it->second;
+      sptr<lexer::Word> tokenPtr = it->second;
 
       if (auto typeTok =
               std::dynamic_pointer_cast<lexer::TypeToken>(tokenPtr)) {
@@ -173,7 +173,7 @@ sptr<Token> Lexer::scan() {
     }
 
     // new id
-    sptr<Word> w = std::make_shared<Word>(s, Tag::ID, startLoc);
+    auto w = std::make_shared<Word>(s, Tag::ID, startLoc);
     reserve(w);
     return w;
   }
