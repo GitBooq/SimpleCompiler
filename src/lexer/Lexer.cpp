@@ -10,7 +10,7 @@
 
 namespace lexer {
 
-Lexer::Lexer(std::istream& in) : input(in), loc{1, 1} {
+Lexer::Lexer(std::istream& in) : input(in), loc{1, 0} {
   // Register reserved keywords
   reserve(std::make_shared<Word>("if", Tag::IF));
   reserve(std::make_shared<Word>("else", Tag::ELSE));
@@ -46,38 +46,26 @@ char Lexer::readch() {
 bool Lexer::readch(char c) {
   char ch = readch();
   if (ch != c) {
-    if (ch != '\0') input.putback(ch);
+    if (ch != '\0') {
+      unreadCh(ch);
+    }
     return false;
   }
   return true;
 }
 
 sptr<Token> Lexer::scan() {
-  // save current symbol location
-  SourceLocation startLoc{loc.line, loc.column + 1};
-
-  int& lineNumber = loc.line;
-  int& columnNumber = loc.column;
-
   // Skip ws and control newlines
-  for (;;) {
-    if (!input.good()) return std::make_shared<Token>(Tag::END, "", startLoc);
-
-    char c = readch();
-    if (c == ' ' || c == '\t') {
-      continue;
-    } else if (c == '\n') {
-      ++lineNumber;
-      columnNumber = 0;
-      startLoc = {lineNumber, columnNumber + 1};
-      continue;
-    } else {
-      input.putback(c);
-      break;
+  char c;
+  do {
+    if (!input.good()) {
+      return std::make_shared<Token>(Tag::END, "", loc);
     }
-  }
+    c = readch();
+  } while (c == ' ' || c == '\t' || c == '\n');
 
-  char c = readch();
+  // save current symbol location
+  SourceLocation startLoc{loc.line, loc.column};
 
   // Operators and separators
   switch (c) {
@@ -155,7 +143,9 @@ sptr<Token> Lexer::scan() {
       s += c;
       c = readch();
     } while (std::isalnum(c));
-    if (c != '\0') input.putback(c);
+    if (c != '\0') {
+      unreadCh(c);
+    }
 
     auto it = words.find(s);
     if (it != words.end()) {
@@ -180,6 +170,11 @@ sptr<Token> Lexer::scan() {
 
   // else one-char symbols
   return std::make_shared<Token>(Tag(c), c, startLoc);
+}
+
+void Lexer::unreadCh(char c) {
+  input.putback(c);
+  --loc.column;
 }
 
 }  // namespace lexer

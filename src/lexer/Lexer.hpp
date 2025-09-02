@@ -38,6 +38,11 @@ struct Lexer : public ILexer {
   /// Reads a single character.
   char readch();
 
+  /** Put character back into stream and decrement column location.
+   *  @param c Character to put back.
+   */
+  void unreadCh(char c);
+
   /// Reads a character and checks it against the expected one.
   bool readch(char c);
 
