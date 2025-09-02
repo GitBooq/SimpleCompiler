@@ -160,4 +160,6 @@ class Parser {
   sptr<ast::Expr> factor();
 };
 
+void error(const std::string& s, const SourceLocation& loc);
+
 }  // namespace parser
